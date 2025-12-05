@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora ESE - Escala de Sonolência de Epworth</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --header-bg: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #6c757d;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 40px;
+            font-size: 15px;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Cabeçalho Compacto */
+        header {
+            background: var(--header-bg);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .hero-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Barra de Status */
+        .status-bar {
+            background: #fff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .progress-block {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .mini-score {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .mini-score i { color: var(--accent-color); margin-right: 8px; }
+        .mini-score span { font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-right: 4px; }
+        .mini-score small { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+        /* Conteúdo */
+        main { padding: 25px; }
+
+        /* Card de Pergunta */
+        .question-card {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+            transition: var(--transition);
+        }
+        
+        .question-card:last-of-type { border-bottom: none; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            background: #eef2f7;
+            color: var(--accent-color);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .question-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .question-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        /* Grid de Opções Compacto */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .option-item { position: relative; }
+        .option-item input { display: none; }
+
+        .option-item label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            min-height: 50px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .option-item label:hover {
+            border-color: #adb5bd;
+            background: #f8f9fa;
+        }
+
+        /* Estados Selecionados - Cores diferentes para intensidades */
+        /* 0 - Nenhuma */
+        .option-item input[value="0"]:checked + label {
+            background-color: #f0fff4; /* Verde bem claro */
+            border-color: var(--success-color);
+            color: #1e7e34;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.2);
+        }
+        /* 1 - Leve */
+        .option-item input[value="1"]:checked + label {
+            background-color: #fffef0;
+            border-color: #f1c40f;
+            color: #9a7d0a;
+            font-weight: 600;
+        }
+        /* 2 - Moderada */
+        .option-item input[value="2"]:checked + label {
+            background-color: #fff8f0;
+            border-color: #e67e22;
+            color: #a04f08;
+            font-weight: 600;
+        }
+        /* 3 - Alta */
+        .option-item input[value="3"]:checked + label {
+            background-color: #fff0f0;
+            border-color: var(--danger-color);
+            color: #c0392b;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
+        }
+
+        /* Botões */
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4); }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid #ced4da;
+        }
+        .btn-secondary:hover { background: #f8f9fa; color: var(--text-main); }
+
+        /* Resultado */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-card {
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #eee;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .result-header {
+            padding: 15px;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .result-body { padding: 30px 20px; }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .result-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .medical-note {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff8e1;
+            color: #856404;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border-left: 4px solid #ffc107;
+            text-align: left;
+        }
+
+        /* Cores Resultado */
+        .res-normal .result-header { background: var(--success-color); }
+        .res-normal .score-display { color: var(--success-color); }
+        
+        .res-medium .result-header { background: var(--warning-color); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .res-medium .score-display { color: var(--warning-color); }
+        
+        .res-high .result-header { background: var(--danger-color); }
+        .res-high .score-display { color: var(--danger-color); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: #95a5a6;
+            font-size: 0.75rem;
+            margin-top: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+            .status-bar { flex-direction: column; gap: 10px; align-items: stretch; }
+            .progress-block { margin-right: 0; }
+            .mini-score { justify-content: center; }
+            .btn { width: 100%; justify-content: center; }
+            .actions { flex-direction: column-reverse; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="hero-icon"><i class="fa-solid fa-moon"></i></div>
+            <h1>Calculadora ESE</h1>
+            <p>Responda qual a chance de cochilar em cada situação abaixo.</p>
+        </header>
+
+        <!-- Barra Sticky -->
+        <div class="status-bar">
+            <div class="progress-block">
+                <div class="progress-text">
+                    <span>Progresso</span>
+                    <span id="progress-text">0/8</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+            </div>
+            
+            <div class="mini-score">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span id="current-score">0</span>
+                <small>pontos</small>
+            </div>
+        </div>
+
+        <main>
+            <form id="ese-form">
+                
+                <!-- Helper de Opções -->
+                <p style="text-align:center; font-size:0.8rem; color:#999; margin-bottom:20px;">
+                    <i class="fa-regular fa-hand-pointer"></i> Selecione uma opção para cada situação
+                </p>
+
+                <!-- Perguntas -->
+                <!-- P1 -->
+                <div class="question-card" id="card-q1">
+                    <div class="card-header">
+                        <div class="question-number">1</div>
+                        <div>
+                            <div class="question-title">Sentar e ler</div>
+                            <div class="question-desc">Lendo algo de interesse em um momento tranquilo.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q1-0" name="q1" value="0">
+                            <label for="q1-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q1-1" name="q1" value="1">
+                            <label for="q1-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q1-2" name="q1" value="2">
+                            <label for="q1-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q1-3" name="q1" value="3">
+                            <label for="q1-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P2 -->
+                <div class="question-card" id="card-q2">
+                    <div class="card-header">
+                        <div class="question-number">2</div>
+                        <div class="question-title">Assistir à TV</div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q2-0" name="q2" value="0"><label for="q2-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q2-1" name="q2" value="1"><label for="q2-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q2-2" name="q2" value="2"><label for="q2-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q2-3" name="q2" value="3"><label for="q2-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P3 -->
+                <div class="question-card" id="card-q3">
+                    <div class="card-header">
+                        <div class="question-number">3</div>
+                        <div>
+                            <div class="question-title">Sentar em local público (inativo)</div>
+                            <div class="question-desc">Ex: sala de espera, teatro ou reunião.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q3-0" name="q3" value="0"><label for="q3-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q3-1" name="q3" value="1"><label for="q3-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q3-2" name="q3" value="2"><label for="q3-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q3-3" name="q3" value="3"><label for="q3-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P4 -->
+                <div class="question-card" id="card-q4">
+                    <div class="card-header">
+                        <div class="question-number">4</div>
+                        <div>
+                            <div class="question-title">Passageiro em um carro (1 hora)</div>
+                            <div class="question-desc">Viagem sem paradas.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q4-0" name="q4" value="0"><label for="q4-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q4-1" name="q4" value="1"><label for="q4-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q4-2" name="q4" value="2"><label for="q4-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q4-3" name="q4" value="3"><label for="q4-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P5 -->
+                <div class="question-card" id="card-q5">
+                    <div class="card-header">
+                        <div class="question-number">5</div>
+                        <div>
+                            <div class="question-title">Deitar à tarde para descansar</div>
+                            <div class="question-desc">Se as circunstâncias permitirem.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q5-0" name="q5" value="0"><label for="q5-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q5-1" name="q5" value="1"><label for="q5-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q5-2" name="q5" value="2"><label for="q5-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q5-3" name="q5" value="3"><label for="q5-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P6 -->
+                <div class="question-card" id="card-q6">
+                    <div class="card-header">
+                        <div class="question-number">6</div>
+                        <div class="question-title">Sentar e conversar</div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q6-0" name="q6" value="0"><label for="q6-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q6-1" name="q6" value="1"><label for="q6-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q6-2" name="q6" value="2"><label for="q6-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q6-3" name="q6" value="3"><label for="q6-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P7 -->
+                <div class="question-card" id="card-q7">
+                    <div class="card-header">
+                        <div class="question-number">7</div>
+                        <div>
+                            <div class="question-title">Sentar em silêncio após o almoço</div>
+                            <div class="question-desc">Sem ingestão de álcool.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q7-0" name="q7" value="0"><label for="q7-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q7-1" name="q7" value="1"><label for="q7-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q7-2" name="q7" value="2"><label for="q7-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q7-3" name="q7" value="3"><label for="q7-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P8 -->
+                <div class="question-card" id="card-q8">
+                    <div class="card-header">
+                        <div class="question-number">8</div>
+                        <div>
+                            <div class="question-title">Parado no trânsito</div>
+                            <div class="question-desc">Motorista, carro parado por alguns minutos.</div>
+                        </div>
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-item">
+                            <input type="radio" id="q8-0" name="q8" value="0"><label for="q8-0">Nenhuma chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q8-1" name="q8" value="1"><label for="q8-1">Leve chance</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q8-2" name="q8" value="2"><label for="q8-2">Chance moderada</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="radio" id="q8-3" name="q8" value="3"><label for="q8-3">Alta chance</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="actions">
+                    <button type="button" class="btn btn-secondary" id="btn-reset">
+                        Limpar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btn-calculate">
+                        Calcular Resultado
+                    </button>
+                </div>
+            </form>
+
+            <!-- Resultado -->
+            <div id="result-container" class="result-section">
+                <div class="result-card" id="result-card-inner">
+                    <div class="result-header" id="result-category-header">Resultado</div>
+                    <div class="result-body">
+                        <div class="score-display" id="result-score">0</div>
+                        <h2 class="result-title" id="result-title">Normal</h2>
+                        <p class="result-desc" id="result-text">Descrição</p>
+                        
+                        <div class="medical-note">
+                            <strong>Nota:</strong> Esta ferramenta é educativa. Diagnósticos de distúrbios do sono devem ser feitos exclusivamente por médicos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        Johns MW. Epworth Sleepiness Scale. Sleep. 1991;14:540-5.
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('ese-form');
+            const allRadios = form.querySelectorAll('input[type="radio"]');
+            const currentScoreEl = document.getElementById('current-score');
+            const progressTextEl = document.getElementById('progress-text');
+            const progressBarEl = document.getElementById('progress-bar');
+            
+            const resultContainer = document.getElementById('result-container');
+            const resultCardInner = document.getElementById('result-card-inner');
+            const resultScore = document.getElementById('result-score');
+            const resultTitle = document.getElementById('result-title');
+            const resultText = document.getElementById('result-text');
+
+            function updateState() {
+                let totalScore = 0;
+                let answeredCount = 0;
+                const answeredQuestions = new Set();
+
+                allRadios.forEach(radio => {
+                    if (radio.checked) {
+                        totalScore += parseInt(radio.value);
+                        answeredQuestions.add(radio.name);
+                    }
+                });
+
+                answeredCount = answeredQuestions.size;
+                currentScoreEl.innerText = totalScore;
+                progressTextEl.innerText = `${answeredCount}/8`;
+                progressBarEl.style.width = `${(answeredCount / 8) * 100}%`;
+            }
+
+            allRadios.forEach(radio => {
+                radio.addEventListener('change', updateState);
+            });
+
+            document.getElementById('btn-calculate').addEventListener('click', () => {
+                const answeredQuestions = new Set();
+                let totalScore = 0;
+
+                allRadios.forEach(radio => {
+                    if (radio.checked) {
+                        answeredQuestions.add(radio.name);
+                        totalScore += parseInt(radio.value);
+                    }
+                });
+
+                if (answeredQuestions.size < 8) {
+                    alert("Por favor, responda todas as situações.");
+                    return;
+                }
+
+                resultCardInner.className = 'result-card';
+                let title = "", desc = "", cssClass = "";
+
+                if (totalScore <= 6) {
+                    title = "Sono Normal";
+                    desc = "Nível normal de sonolência diurna. A chance de cochilar é considerada saudável.";
+                    cssClass = "res-normal";
+                } else if (totalScore <= 8) {
+                    title = "Média de Sonolência";
+                    desc = "Sonolência moderada. Comum em muitos adultos, mas requer atenção se atrapalhar a rotina.";
+                    cssClass = "res-medium";
+                } else {
+                    title = "Sonolência Anormal";
+                    desc = "Pontuação elevada. Sugere sonolência excessiva, que pode estar ligada a condições como apneia ou narcolepsia.";
+                    cssClass = "res-high";
+                }
+
+                resultCardInner.classList.add(cssClass);
+                resultScore.innerText = totalScore;
+                resultTitle.innerText = title;
+                resultText.innerText = desc;
+                resultContainer.style.display = 'block';
+                
+                setTimeout(() => resultContainer.scrollIntoView({ behavior: 'smooth' }), 100);
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                if(confirm("Limpar respostas?")) {
+                    form.reset();
+                    updateState();
+                    resultContainer.style.display = 'none';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
