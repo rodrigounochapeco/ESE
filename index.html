@@ -14,20 +14,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* Variáveis Padrão (Light Mode) */
         :root {
             --primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --header-bg: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            
             --bg-body: #f4f6f9;
             --card-bg: #ffffff;
             --text-main: #2c3e50;
             --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --border-hover: #adb5bd;
+            
             --accent-color: #3498db;
             --success-color: #2ecc71;
             --warning-color: #f1c40f;
             --danger-color: #e74c3c;
-            --border-radius: 12px;
+            
+            /* Cores de fundo das opções selecionadas (Light) */
+            --bg-sel-0: #f0fff4; --border-sel-0: #2ecc71; --text-sel-0: #1e7e34;
+            --bg-sel-1: #fffef0; --border-sel-1: #f1c40f; --text-sel-1: #9a7d0a;
+            --bg-sel-2: #fff8f0; --border-sel-2: #e67e22; --text-sel-2: #a04f08;
+            --bg-sel-3: #fff0f0; --border-sel-3: #e74c3c; --text-sel-3: #c0392b;
+
+            --medical-bg: #fff8e1;
+            --medical-text: #856404;
+            --medical-border: #ffc107;
+            
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             --transition: all 0.2s ease-in-out;
+            --border-radius: 12px;
+        }
+
+        /* Variáveis Modo Noturno (Dark Mode) */
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #2980b9 0%, #2c3e50 100%);
+            --header-bg: linear-gradient(135deg, #1a252f 0%, #000000 100%);
+            
+            --bg-body: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+            --border-hover: #555555;
+            
+            --accent-color: #5dade2;
+            
+            /* Cores de fundo das opções selecionadas (Dark - mais escuras/opacas) */
+            --bg-sel-0: rgba(46, 204, 113, 0.15); --border-sel-0: #2ecc71; --text-sel-0: #abebc6;
+            --bg-sel-1: rgba(241, 196, 15, 0.15); --border-sel-1: #f1c40f; --text-sel-1: #f9e79f;
+            --bg-sel-2: rgba(230, 126, 34, 0.15); --border-sel-2: #e67e22; --text-sel-2: #edbb99;
+            --bg-sel-3: rgba(231, 76, 60, 0.15); --border-sel-3: #e74c3c; --text-sel-3: #f5b7b1;
+
+            --medical-bg: #2c2500;
+            --medical-text: #ffeeba;
+            --medical-border: #665c1c;
+
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -43,6 +86,7 @@
             line-height: 1.5;
             padding-bottom: 40px;
             font-size: 15px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Container Principal */
@@ -53,15 +97,95 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
+            transition: background-color 0.3s ease;
         }
 
-        /* Cabeçalho Compacto */
+        /* Cabeçalho */
         header {
             background: var(--header-bg);
             color: white;
             padding: 30px 20px;
             text-align: center;
+            position: relative;
         }
+
+        /* Toggle Switch (Interruptor) */
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .theme-label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input { 
+            opacity: 0; 
+            width: 0; 
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.3);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Ícones dentro do switch (opcional, via CSS) */
+        .slider-icon {
+            color: white;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            pointer-events: none;
+        }
+        .fa-sun { left: 7px; opacity: 0; transition: opacity 0.3s; }
+        .fa-moon { right: 8px; opacity: 1; transition: opacity 0.3s; }
+        
+        input:checked + .slider .fa-moon { opacity: 0; }
+        input:checked + .slider .fa-sun { opacity: 1; }
+
 
         .hero-icon {
             font-size: 2.5rem;
@@ -85,16 +209,16 @@
 
         /* Barra de Status */
         .status-bar {
-            background: #fff;
+            background: var(--card-bg);
             padding: 15px 25px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            transition: background-color 0.3s ease;
         }
 
         .progress-block {
@@ -113,7 +237,7 @@
         .progress-track {
             width: 100%;
             height: 6px;
-            background: #e9ecef;
+            background: var(--border-color);
             border-radius: 4px;
             overflow: hidden;
         }
@@ -129,10 +253,10 @@
         .mini-score {
             display: flex;
             align-items: center;
-            background: #f8f9fa;
+            background: var(--bg-body);
             padding: 8px 16px;
             border-radius: 20px;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border-color);
         }
 
         .mini-score i { color: var(--accent-color); margin-right: 8px; }
@@ -144,8 +268,8 @@
 
         /* Card de Pergunta */
         .question-card {
-            background: #fff;
-            border-bottom: 1px solid #eee;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
             padding: 20px 0;
             transition: var(--transition);
         }
@@ -160,11 +284,12 @@
         }
 
         .question-number {
-            background: #eef2f7;
+            background: var(--bg-body);
             color: var(--accent-color);
             width: 30px;
             height: 30px;
             border-radius: 50%;
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -186,7 +311,7 @@
             font-weight: 400;
         }
 
-        /* Grid de Opções Compacto */
+        /* Grid de Opções */
         .options-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -204,8 +329,8 @@
             height: 100%;
             min-height: 50px;
             padding: 10px;
-            background: #fff;
-            border: 1px solid #dee2e6;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
             transition: var(--transition);
@@ -216,40 +341,34 @@
         }
 
         .option-item label:hover {
-            border-color: #adb5bd;
-            background: #f8f9fa;
+            border-color: var(--border-hover);
+            background: var(--bg-body);
         }
 
-        /* Estados Selecionados - Cores diferentes para intensidades */
-        /* 0 - Nenhuma */
+        /* Estados Selecionados com Cores Dinâmicas */
         .option-item input[value="0"]:checked + label {
-            background-color: #f0fff4; /* Verde bem claro */
-            border-color: var(--success-color);
-            color: #1e7e34;
+            background-color: var(--bg-sel-0);
+            border-color: var(--border-sel-0);
+            color: var(--text-sel-0);
             font-weight: 600;
-            box-shadow: 0 2px 5px rgba(46, 204, 113, 0.2);
         }
-        /* 1 - Leve */
         .option-item input[value="1"]:checked + label {
-            background-color: #fffef0;
-            border-color: #f1c40f;
-            color: #9a7d0a;
+            background-color: var(--bg-sel-1);
+            border-color: var(--border-sel-1);
+            color: var(--text-sel-1);
             font-weight: 600;
         }
-        /* 2 - Moderada */
         .option-item input[value="2"]:checked + label {
-            background-color: #fff8f0;
-            border-color: #e67e22;
-            color: #a04f08;
+            background-color: var(--bg-sel-2);
+            border-color: var(--border-sel-2);
+            color: var(--text-sel-2);
             font-weight: 600;
         }
-        /* 3 - Alta */
         .option-item input[value="3"]:checked + label {
-            background-color: #fff0f0;
-            border-color: var(--danger-color);
-            color: #c0392b;
+            background-color: var(--bg-sel-3);
+            border-color: var(--border-sel-3);
+            color: var(--text-sel-3);
             font-weight: 600;
-            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.2);
         }
 
         /* Botões */
@@ -259,7 +378,7 @@
             justify-content: center;
             margin-top: 30px;
             padding-top: 20px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border-color);
         }
 
         .btn {
@@ -286,9 +405,9 @@
         .btn-secondary {
             background: transparent;
             color: var(--text-muted);
-            border: 1px solid #ced4da;
+            border: 1px solid var(--border-color);
         }
-        .btn-secondary:hover { background: #f8f9fa; color: var(--text-main); }
+        .btn-secondary:hover { background: var(--bg-body); color: var(--text-main); }
 
         /* Resultado */
         .result-section {
@@ -299,8 +418,8 @@
 
         .result-card {
             border-radius: 12px;
-            background: #fff;
-            border: 1px solid #eee;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             overflow: hidden;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -341,11 +460,11 @@
         .medical-note {
             margin-top: 20px;
             padding: 12px;
-            background: #fff8e1;
-            color: #856404;
+            background: var(--medical-bg);
+            color: var(--medical-text);
             border-radius: 8px;
             font-size: 0.85rem;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid var(--medical-border);
             text-align: left;
         }
 
@@ -359,12 +478,12 @@
         .res-high .result-header { background: var(--danger-color); }
         .res-high .score-display { color: var(--danger-color); }
 
-        /* Footer */
         footer {
             text-align: center;
-            color: #95a5a6;
+            color: var(--text-muted);
             font-size: 0.75rem;
             margin-top: 30px;
+            opacity: 0.7;
         }
 
         @keyframes fadeIn {
@@ -372,7 +491,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Mobile */
         @media (max-width: 600px) {
             .options-grid { grid-template-columns: repeat(2, 1fr); }
             .status-bar { flex-direction: column; gap: 10px; align-items: stretch; }
@@ -387,6 +505,18 @@
 
     <div class="container">
         <header>
+            <!-- Toggle de Tema -->
+            <div class="theme-switch-wrapper">
+                <span class="theme-label">Noturno</span>
+                <label class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider">
+                        <i class="fa-solid fa-moon slider-icon"></i>
+                        <i class="fa-solid fa-sun slider-icon"></i>
+                    </span>
+                </label>
+            </div>
+
             <div class="hero-icon"><i class="fa-solid fa-moon"></i></div>
             <h1>Calculadora ESE</h1>
             <p>Responda qual a chance de cochilar em cada situação abaixo.</p>
@@ -414,12 +544,10 @@
         <main>
             <form id="ese-form">
                 
-                <!-- Helper de Opções -->
-                <p style="text-align:center; font-size:0.8rem; color:#999; margin-bottom:20px;">
+                <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:20px;">
                     <i class="fa-regular fa-hand-pointer"></i> Selecione uma opção para cada situação
                 </p>
 
-                <!-- Perguntas -->
                 <!-- P1 -->
                 <div class="question-card" id="card-q1">
                     <div class="card-header">
@@ -431,20 +559,16 @@
                     </div>
                     <div class="options-grid">
                         <div class="option-item">
-                            <input type="radio" id="q1-0" name="q1" value="0">
-                            <label for="q1-0">Nenhuma chance</label>
+                            <input type="radio" id="q1-0" name="q1" value="0"><label for="q1-0">Nenhuma chance</label>
                         </div>
                         <div class="option-item">
-                            <input type="radio" id="q1-1" name="q1" value="1">
-                            <label for="q1-1">Leve chance</label>
+                            <input type="radio" id="q1-1" name="q1" value="1"><label for="q1-1">Leve chance</label>
                         </div>
                         <div class="option-item">
-                            <input type="radio" id="q1-2" name="q1" value="2">
-                            <label for="q1-2">Chance moderada</label>
+                            <input type="radio" id="q1-2" name="q1" value="2"><label for="q1-2">Chance moderada</label>
                         </div>
                         <div class="option-item">
-                            <input type="radio" id="q1-3" name="q1" value="3">
-                            <label for="q1-3">Alta chance</label>
+                            <input type="radio" id="q1-3" name="q1" value="3"><label for="q1-3">Alta chance</label>
                         </div>
                     </div>
                 </div>
@@ -653,6 +777,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Lógica de Tema (Dark Mode) ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            // Verificar preferência salva
+            const savedTheme = localStorage.getItem('ese_theme');
+            if (savedTheme === 'dark') {
+                html.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+            }
+
+            // Ouvinte do switch
+            themeToggle.addEventListener('change', () => {
+                if(themeToggle.checked) {
+                    html.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('ese_theme', 'dark');
+                } else {
+                    html.removeAttribute('data-theme');
+                    localStorage.setItem('ese_theme', 'light');
+                }
+            });
+
+            // --- Lógica da Calculadora ---
             const form = document.getElementById('ese-form');
             const allRadios = form.querySelectorAll('input[type="radio"]');
             const currentScoreEl = document.getElementById('current-score');
